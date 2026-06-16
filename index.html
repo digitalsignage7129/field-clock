@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現場向けデジタルクロック</title>
+    <style>
+        /* 画面焼き付き防止のため背景は完全な黒、文字は白 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* サイネージの解像度 500x300 に合わせたコンテナ */
+        .clock-container {
+            width: 500px;
+            height: 300px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #222222; /* 控えめな枠線（不要なら削除してください） */
+            background-color: #000000;
+        }
+
+        /* 上部：日付・曜日エリア */
+        .date-box {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .date-text {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+        .day-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-left: 15px;
+            padding: 2px 10px;
+            border-radius: 4px;
+            background-color: #333333; /* 曜日を少し目立たせる */
+        }
+        /* 日曜・土曜の視認性（現場の休工識別用） */
+        .day-text.sun { color: #ff4d4d; background-color: #2a0000; }
+        .day-text.sat { color: #4dadff; background-color: #001f3f; }
+
+        /* 中部：メインの時間表示 */
+        .time-box {
+            display: flex;
+            align-items: baseline;
+            font-family: 'Courier New', Courier, monospace; /* 等幅フォントで文字のガタつきを防止 */
+            font-weight: bold;
+            line-height: 1;
+        }
+        .time-main {
+            font-size: 6.5rem;
+            letter-spacing: -2px;
+        }
+        .time-seconds {
+            font-size: 3rem;
+            margin-left: 8px;
+            color: #aaaaaa; /* 秒数は少し明度を下げて上品に */
+        }
+
+        /* 下部：現場用アクセント（安全第一などのメッセージ等に変えてもOK） */
+        .footer-box {
+            font-size: 1.1rem;
+            color: #888888;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clock-container">
+        <div class="date-box">
+            <span class="date-text" id="date-display">2026.06.16</span>
+            <span class="day-text" id="day-display">TUE</span>
+        </div>
+
+        <div class="time-box">
+            <span class="time-main" id="time-display">12:34</span>
+            <span class="time-seconds" id="seconds-display">56</span>
+        </div>
+
+        <div class="footer-box" id="footer-display">
+            SAFETY FIRST
+        </div>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+
+            // 年・月・日の取得と整形
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            document.getElementById('date-display').textContent = `${year}.${month}.${date}`;
+
+            // 曜日の取得（英語表記でお洒落に）
+            const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            const dayIdx = now.getDay();
+            const dayElement = document.getElementById('day-display');
+            dayElement.textContent = days[dayIdx];
+            
+            // 曜日ごとの色分けクラス適用
+            dayElement.className = 'day-text'; // リセット
+            if (dayIdx === 0) dayElement.classList.add('sun');
+            if (dayIdx === 6) dayElement.classList.add('sat');
+
+            // 時・分の取得
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time-display').textContent = `${hours}:${minutes}`;
+
+            // 秒の取得
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('seconds-display').textContent = seconds;
+        }
+
+        // 初回実行と1秒ごとの定期更新
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
