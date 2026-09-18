@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>秋の全国交通安全運動 啓発パネル</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #eef3f8;
+      font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+      color: #1a2733;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /*
+      【基準キャンバス (550px x 730px)】
+      暑さ指数パネルと同程度の大きさを想定。JSで自動フィットさせる。
+    */
+    #stage {
+      width: 550px;
+      height: 730px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transform-origin: center center;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #eaf2fb 0%, #dbe9f8 100%);
+    }
+    /* ヘッダー */
+    .header {
+      background: #d0021b;
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .header .badge {
+      background: #ffcc00;
+      color: #1a2733;
+      font-size: 16px;
+      font-weight: 900;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .header .title {
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+    .header .subtitle {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 6px;
+      color: #ffe8ea;
+    }
+    /* マスコット/イラストエリア */
+    .illust {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 14px 10px;
+      border: 2px solid #c9d9ea;
+    }
+    .illust .icon {
+      font-size: 64px;
+      line-height: 1;
+    }
+    .illust .catch {
+      font-size: 20px;
+      font-weight: 900;
+      color: #d0021b;
+      line-height: 1.4;
+    }
+    .illust .catch small {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #445266;
+      margin-top: 4px;
+    }
+    /* 行動指針リスト */
+    .guide-title {
+      font-size: 17px;
+      font-weight: 900;
+      color: #1a2733;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 8px 14px;
+      border-left: 8px solid #d0021b;
+      flex-shrink: 0;
+    }
+    .guide-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+    .guide-item {
+      flex: 1;
+      background: #ffffff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      border-left: 10px solid #999999;
+    }
+    .guide-item .emoji {
+      font-size: 34px;
+      flex-shrink: 0;
+    }
+    .guide-item .text {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+    .guide-item .text .head {
+      display: inline-block;
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      padding: 2px 10px;
+      border-radius: 6px;
+      margin-right: 6px;
+    }
+    .g1 { border-color: #d0021b; }
+    .g1 .head { background: #d0021b; }
+    .g2 { border-color: #f5a623; }
+    .g2 .head { background: #f5a623; color: #1a2733; }
+    .g3 { border-color: #0077cc; }
+    .g3 .head { background: #0077cc; }
+    .g4 { border-color: #2e9e44; }
+    .g4 .head { background: #2e9e44; }
+    /* フッター */
+    .footer {
+      flex-shrink: 0;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #445266;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <div class="header">
+      <div class="badge">9/21〜9/30 実施中</div>
+      <div class="title">秋の全国交通安全運動</div>
+      <div class="subtitle">構内・通勤時の交通事故防止にご協力ください</div>
+    </div>
+    <div class="illust">
+      <div class="icon">🚦</div>
+      <div class="catch">
+        一時停止・指差呼称の徹底
+        <small>「止まる」「見る」「確かめる」を毎回の習慣に</small>
+      </div>
+    </div>
+    <div class="guide-title">交通事故防止 行動指針</div>
+    <div class="guide-list">
+      <div class="guide-item g1">
+        <div class="emoji">🚧</div>
+        <div class="text"><span class="head">最重要</span>構内はフォークリフト・車両優先エリア。歩行者は必ず指定通路を歩行</div>
+      </div>
+      <div class="guide-item g2">
+        <div class="emoji">🛑</div>
+        <div class="text"><span class="head">徹底</span>交差点・出入口では一時停止と左右確認を必ず実施</div>
+      </div>
+      <div class="guide-item g3">
+        <div class="emoji">🌆</div>
+        <div class="text"><span class="head">習慣</span>日没が早まる時期。夕方の運転は早めのライト点灯を</div>
+      </div>
+      <div class="guide-item g4">
+        <div class="emoji">🚲</div>
+        <div class="text"><span class="head">注意</span>自転車・バイク通勤者はヘルメット着用と速度控えめを心がける</div>
+      </div>
+    </div>
+    <div class="footer">安全＋第一　安全はひとりひとりが責任者</div>
+  </div>
+  <script>
+    function autoFit() {
+      const targetW = 550;
+      const targetH = 730;
+      const currentW = window.innerWidth;
+      const currentH = window.innerHeight;
+      if (currentW === 0 || currentH === 0) return;
+      const scale = Math.min(currentW / targetW, currentH / targetH);
+      const stage = document.getElementById('stage');
+      if (stage) stage.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', autoFit);
+    window.addEventListener('DOMContentLoaded', autoFit);
+    window.addEventListener('load', autoFit);
+    autoFit();
+  </script>
+</body>
+</html>
