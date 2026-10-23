@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Elegant Clock 310x904</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== 時間帯で自動切替するカラーテーマ ===== */
+  :root{
+    --bg1:#fbf8f2; --bg2:#eee5d4; --ink:#2b2a28; --sub:#7a746a;
+    --gold:#a8834a; --line:rgba(168,131,74,.55); --accent:#b0413e; --sat:#3d5a80;
+  }
+  .t-morning{ --bg1:#f8f6f0; --bg2:#e6ebe8; --ink:#24304a; --sub:#6c7486; --gold:#a8834a; --line:rgba(168,131,74,.5); --accent:#b0413e; --sat:#3d5a80;}
+  .t-day    { --bg1:#fbf8f2; --bg2:#eee5d4; --ink:#2b2a28; --sub:#7a746a; --gold:#a8834a; --line:rgba(168,131,74,.55); --accent:#b0413e; --sat:#3d5a80;}
+  .t-evening{ --bg1:#3b2630; --bg2:#1f1720; --ink:#f3e7da; --sub:#c7b2a4; --gold:#d6b27a; --line:rgba(214,178,122,.5); --accent:#e3876f; --sat:#9fb6d6;}
+  .t-night  { --bg1:#17223a; --bg2:#0b111e; --ink:#eef0f4; --sub:#9aa3b5; --gold:#cfae72; --line:rgba(207,174,114,.45); --accent:#e08a80; --sat:#8fb0e0;}
+
+  html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%}
+  #stage{
+    position:absolute;left:0;top:0;width:310px;height:904px;overflow:hidden;
+    transform-origin:0 0;
+    background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 100%);
+    color:var(--ink);
+    font-family:"Cormorant Garamond","Times New Roman",serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .frame{position:absolute;inset:14px;border:1px solid var(--line);pointer-events:none;z-index:5}
+  .frame::before{content:"";position:absolute;inset:5px;border:1px solid var(--line);opacity:.45}
+  .corner{position:absolute;width:10px;height:10px;background:var(--gold);transform:rotate(45deg);z-index:6}
+  .c-t{top:9px;left:150px}.c-b{bottom:9px;left:150px}
+
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+         opacity:0;transition:opacity 1.6s ease;}
+  .scene.on{opacity:1}
+
+  .greet{font-size:15px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:500}
+  .greet-jp{font-family:"Shippori Mincho",serif;font-size:13px;letter-spacing:.3em;color:var(--sub);margin-top:6px}
+  .num{font-variant-numeric:lining-nums tabular-nums}
+
+  /* --- Scene 1 : Digital --- */
+  .d-hh,.d-mm{font-size:176px;line-height:.86;font-weight:300;letter-spacing:-.02em}
+  .d-rule{width:190px;height:1px;background:var(--line);margin:26px 0 30px;position:relative}
+  .d-sec{position:absolute;left:0;top:-1px;height:3px;background:var(--gold);width:0}
+  .d-rule::before,.d-rule::after{content:"";position:absolute;top:-3px;width:7px;height:7px;background:var(--gold);transform:rotate(45deg)}
+  .d-rule::before{left:-12px}.d-rule::after{right:-12px}
+  .d-week{margin-top:54px;font-size:20px;letter-spacing:.42em;padding-left:.42em;font-weight:500}
+  .d-date{font-size:30px;font-style:italic;margin-top:4px}
+  .d-jp{font-family:"Shippori Mincho",serif;font-size:14px;color:var(--sub);letter-spacing:.12em;margin-top:10px}
+
+  /* --- Scene 2 : Analog --- */
+  .a-svg{width:270px;height:270px;margin:40px 0 44px}
+  .a-digi{font-size:44px;font-weight:400;letter-spacing:.06em}
+  .a-date{font-size:18px;letter-spacing:.34em;padding-left:.34em;color:var(--sub);margin-top:6px}
+
+  /* --- Scene 3 : 縦書き --- */
+  .v-wrap{display:flex;flex-direction:row-reverse;align-items:flex-start;gap:26px;font-family:"Shippori Mincho",serif}
+  .v-col{writing-mode:vertical-rl;text-orientation:upright;white-space:nowrap}
+  .v-small{font-size:17px;letter-spacing:.32em;color:var(--sub)}
+  .v-big{font-size:58px;letter-spacing:.12em;font-weight:600;line-height:1}
+  .v-mid{padding-top:120px}
+  .seal{width:46px;height:46px;border:2px solid var(--accent);color:var(--accent);border-radius:4px;
+        display:flex;align-items:center;justify-content:center;font-family:"Shippori Mincho",serif;font-size:24px;font-weight:600;margin-top:46px}
+
+  /* --- Scene 4 : Calendar --- */
+  .c-month{font-size:150px;line-height:.85;font-weight:300}
+  .c-month-en{font-size:20px;letter-spacing:.4em;padding-left:.4em;text-transform:uppercase;margin-top:12px;font-weight:500}
+  .c-era{font-family:"Shippori Mincho",serif;font-size:13px;color:var(--sub);letter-spacing:.2em;margin-top:6px}
+  .c-grid{display:grid;grid-template-columns:repeat(7,36px);gap:2px;margin:36px 0 34px}
+  .c-grid div{height:34px;display:flex;align-items:center;justify-content:center;font-size:19px}
+  .c-grid .h{font-size:13px;letter-spacing:.08em;color:var(--sub);font-weight:500;height:26px}
+  .c-grid .sun{color:var(--accent)} .c-grid .sat{color:var(--sat)}
+  .c-grid .today{background:var(--gold);color:var(--bg1);border-radius:50%;font-weight:500}
+  .c-time{font-size:58px;font-weight:300;letter-spacing:.04em}
+  .c-week{font-size:15px;letter-spacing:.36em;padding-left:.36em;color:var(--gold);font-weight:500}
+</style>
+</head>
+<body>
+<div id="stage" class="t-day">
+  <div class="frame"></div><div class="corner c-t"></div><div class="corner c-b"></div>
+
+  <!-- Scene 1 : Digital -->
+  <section class="scene" id="s-digital">
+    <div class="greet js-greet">Good Afternoon</div>
+    <div class="greet-jp js-greet-jp">こんにちは</div>
+    <div style="height:46px"></div>
+    <div class="d-hh num" id="d-hh">00</div>
+    <div class="d-rule"><span class="d-sec" id="d-sec"></span></div>
+    <div class="d-mm num" id="d-mm">00</div>
+    <div class="d-week" id="d-week">FRIDAY</div>
+    <div class="d-date num" id="d-date">October 23</div>
+    <div class="d-jp num" id="d-jp">2026.10.23（金）</div>
+  </section>
+
+  <!-- Scene 2 : Analog -->
+  <section class="scene" id="s-analog">
+    <div class="greet js-greet">Good Afternoon</div>
+    <div class="greet-jp js-greet-jp">こんにちは</div>
+    <svg class="a-svg" viewBox="0 0 260 260" aria-hidden="true">
+      <circle cx="130" cy="130" r="126" fill="none" stroke="var(--line)" stroke-width="1"/>
+      <circle cx="130" cy="130" r="118" fill="none" stroke="var(--line)" stroke-width="1" opacity=".5"/>
+      <g id="a-ticks"></g>
+      <line id="a-h" x1="130" y1="142" x2="130" y2="72" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
+      <line id="a-m" x1="130" y1="146" x2="130" y2="40" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <line id="a-s" x1="130" y1="152" x2="130" y2="30" stroke="var(--gold)" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="130" cy="130" r="5" fill="var(--gold)"/>
+      <circle cx="130" cy="130" r="2" fill="var(--bg1)"/>
+    </svg>
+    <div class="a-digi num" id="a-digi">00:00</div>
+    <div class="a-date num" id="a-date">10.23 FRI</div>
+  </section>
+
+  <!-- Scene 3 : 縦書き -->
+  <section class="scene" id="s-vertical">
+    <div class="v-wrap">
+      <div class="v-col v-small" id="v-date">令和八年　十月二十三日</div>
+      <div class="v-col v-big v-mid" id="v-hh">十五時</div>
+      <div class="v-col v-big v-mid" id="v-mm">二十一分</div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="v-col v-small" id="v-week">金曜日</div>
+        <div class="seal">時</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 4 : Calendar -->
+  <section class="scene" id="s-calendar">
+    <div class="c-month num" id="c-month">10</div>
+    <div class="c-month-en" id="c-month-en">October 2026</div>
+    <div class="c-era" id="c-era">令和八年</div>
+    <div class="c-grid num" id="c-grid"></div>
+    <div class="c-week" id="c-week">FRIDAY</div>
+    <div class="c-time num" id="c-time">00:00</div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var W=310,H=904;
+  var q=new URLSearchParams(location.search);
+  var INTERVAL=Math.max(5,parseInt(q.get("interval")||"15",10))*1000; // 切替秒数
+  var FIX=q.get("scene");          // digital / analog / vertical / calendar で固定
+  var THEME=q.get("theme");        // morning / day / evening / night で固定
+
+  var $=function(id){return document.getElementById(id)};
+  var stage=$("stage");
+
+  /* --- 画面サイズに合わせて拡大縮小（比率維持・中央寄せ） --- */
+  function fit(){
+    var s=Math.min(innerWidth/W,innerHeight/H);
+    var x=(innerWidth-W*s)/2, y=(innerHeight-H*s)/2;
+    stage.style.transform="translate("+x+"px,"+y+"px) scale("+s+")";
+  }
+  addEventListener("resize",fit); fit();
+
+  /* --- 定数 --- */
+  var WEEK_EN=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+  var WEEK_SH=["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  var WEEK_JP=["日","月","火","水","木","金","土"];
+  var MON_EN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var KD=["〇","一","二","三","四","五","六","七","八","九"];
+  function kan(n){
+    if(n===0) return "零";
+    var t=Math.floor(n/10),o=n%10,s="";
+    if(t>1) s+=KD[t];
+    if(t>=1) s+="十";
+    if(o>0) s+=KD[o];
+    return s;
+  }
+  function pad(n){return (n<10?"0":"")+n}
+  function reiwa(y){var r=y-2018;return r===1?"元":kan(r)}
+  function set(el,v){ if(el && el.textContent!==v) el.textContent=v; }
+
+  /* --- アナログ目盛り --- */
+  (function(){
+    var g=$("a-ticks"),ns="http://www.w3.org/2000/svg";
+    for(var i=0;i<60;i++){
+      var major=i%5===0, a=i*6*Math.PI/180;
+      var r1=major?104:110, r2=114;
+      var l=document.createElementNS(ns,"line");
+      l.setAttribute("x1",130+r1*Math.sin(a)); l.setAttribute("y1",130-r1*Math.cos(a));
+      l.setAttribute("x2",130+r2*Math.sin(a)); l.setAttribute("y2",130-r2*Math.cos(a));
+      l.setAttribute("stroke",major?"var(--gold)":"var(--line)");
+      l.setAttribute("stroke-width",i%15===0?3:(major?1.6:1));
+      g.appendChild(l);
+    }
+  })();
+
+  /* --- 時間帯テーマ --- */
+  function themeFor(h){
+    if(THEME) return THEME;
+    if(h>=5&&h<10) return "morning";
+    if(h>=10&&h<17) return "day";
+    if(h>=17&&h<20) return "evening";
+    return "night";
+  }
+  function greetFor(h){
+    if(h>=5&&h<11) return ["Good Morning","おはようございます"];
+    if(h>=11&&h<17) return ["Good Afternoon","こんにちは"];
+    return ["Good Evening","こんばんは"];
+  }
+
+  /* --- カレンダー --- */
+  var calKey="";
+  function renderCal(d){
+    var y=d.getFullYear(),m=d.getMonth(),today=d.getDate();
+    var key=y+"-"+m+"-"+today; if(key===calKey) return; calKey=key;
+    var g=$("c-grid"),html="";
+    for(var i=0;i<7;i++) html+='<div class="h '+(i===0?"sun":i===6?"sat":"")+'">'+WEEK_SH[i]+'</div>';
+    var first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+    for(i=0;i<first;i++) html+="<div></div>";
+    for(var dd=1;dd<=days;dd++){
+      var w=(first+dd-1)%7, c=[];
+      if(w===0)c.push("sun"); if(w===6)c.push("sat"); if(dd===today)c.push("today");
+      html+='<div class="'+c.join(" ")+'">'+dd+"</div>";
+    }
+    g.innerHTML=html;
+  }
+
+  /* --- 毎秒の表示更新 --- */
+  var lastSec=-1, greetEls=document.querySelectorAll(".js-greet"), greetJpEls=document.querySelectorAll(".js-greet-jp");
+  function update(d){
+    var h=d.getHours(),mi=d.getMinutes(),s=d.getSeconds(),y=d.getFullYear(),mo=d.getMonth(),da=d.getDate(),w=d.getDay();
+
+    var th="t-"+themeFor(h); if(stage.className!==th) stage.className=th;
+    var g=greetFor(h);
+    for(var i=0;i<greetEls.length;i++){ set(greetEls[i],g[0]); set(greetJpEls[i],g[1]); }
+
+    // Digital
+    set($("d-hh"),pad(h)); set($("d-mm"),pad(mi));
+    set($("d-week"),WEEK_EN[w]); set($("d-date"),MON_EN[mo]+" "+da);
+    set($("d-jp"),y+"."+pad(mo+1)+"."+pad(da)+"（"+WEEK_JP[w]+"）");
+    var bar=$("d-sec");
+    if(s===0){ bar.style.transition="none"; bar.style.width="0"; void bar.offsetWidth; }
+    else { bar.style.transition="width 1s linear"; bar.style.width=(s/59*100)+"%"; }
+
+    // Analog
+    set($("a-digi"),pad(h)+":"+pad(mi));
+    set($("a-date"),pad(mo+1)+"."+pad(da)+" "+WEEK_SH[w]);
+
+    // 縦書き
+    set($("v-date"),"令和"+reiwa(y)+"年　"+kan(mo+1)+"月"+kan(da)+"日");
+    set($("v-hh"),kan(h)+"時");
+    set($("v-mm"),mi===0?"丁度":kan(mi)+"分");
+    set($("v-week"),WEEK_JP[w]+"曜日");
+
+    // Calendar
+    set($("c-month"),String(mo+1)); set($("c-month-en"),MON_EN[mo]+" "+y);
+    set($("c-era"),"令和"+reiwa(y)+"年"); set($("c-week"),WEEK_EN[w]);
+    set($("c-time"),pad(h)+":"+pad(mi));
+    renderCal(d);
+  }
+
+  /* --- アナログ針（なめらか秒針） --- */
+  var aH=$("a-h"),aM=$("a-m"),aS=$("a-s");
+  function frame(){
+    var d=new Date(), ms=d.getMilliseconds(), s=d.getSeconds()+ms/1000, m=d.getMinutes()+s/60, h=(d.getHours()%12)+m/60;
+    aS.setAttribute("transform","rotate("+(s*6)+" 130 130)");
+    aM.setAttribute("transform","rotate("+(m*6)+" 130 130)");
+    aH.setAttribute("transform","rotate("+(h*30)+" 130 130)");
+    if(d.getSeconds()!==lastSec){ lastSec=d.getSeconds(); update(d); }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* --- シーン切替 --- */
+  var order=["digital","analog","vertical","calendar"];
+  var scenes=order.map(function(n){return $("s-"+n)});
+  var idx=FIX&&order.indexOf(FIX)>=0?order.indexOf(FIX):0;
+  scenes[idx].classList.add("on");
+  if(!FIX){
+    setInterval(function(){
+      scenes[idx].classList.remove("on");
+      idx=(idx+1)%scenes.length;
+      scenes[idx].classList.add("on");
+    },INTERVAL);
+  }
+})();
+</script>
+</body>
+</html>
