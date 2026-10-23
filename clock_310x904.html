@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=310,user-scalable=no">
 <title>Elegant Clock 310x904</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,13 +148,38 @@
   var $=function(id){return document.getElementById(id)};
   var stage=$("stage");
 
-  /* --- 画面サイズに合わせて拡大縮小（比率維持・中央寄せ） --- */
-  function fit(){
-    var s=Math.min(innerWidth/W,innerHeight/H);
-    var x=(innerWidth-W*s)/2, y=(innerHeight-H*s)/2;
-    stage.style.transform="translate("+x+"px,"+y+"px) scale("+s+")";
+  /* --- 画面サイズに合わせて拡大縮小（比率維持・中央寄せ） ---
+     ?fit=0      … 拡大縮小しない（左上に310×904で固定）
+     ?scale=0.8  … 倍率を手動指定
+     ?debug=1    … 画面サイズ情報を表示 */
+  var FIT=q.get("fit")!=="0";
+  var MANUAL=parseFloat(q.get("scale")||"");
+  var DEBUG=q.get("debug")==="1";
+  var dbg=null;
+  if(DEBUG){
+    dbg=document.createElement("div");
+    dbg.style.cssText="position:fixed;left:0;top:0;z-index:99;background:rgba(0,0,0,.8);color:#0f0;font:12px monospace;padding:4px;white-space:pre";
+    document.body.appendChild(dbg);
   }
-  addEventListener("resize",fit); fit();
+  function viewSize(){
+    var de=document.documentElement;
+    var w=de.clientWidth||innerWidth||W, h=de.clientHeight||innerHeight||H;
+    return [w,h];
+  }
+  function fit(){
+    var v=viewSize(), vw=v[0], vh=v[1], s=1, x=0, y=0;
+    if(MANUAL>0){ s=MANUAL; }
+    else if(FIT && vw>0 && vh>0){
+      s=Math.min(vw/W, vh/H);
+      x=Math.max(0,(vw-W*s)/2); y=Math.max(0,(vh-H*s)/2);
+    }
+    stage.style.transform="translate("+x+"px,"+y+"px) scale("+s+")";
+    if(dbg) dbg.textContent="inner "+innerWidth+"x"+innerHeight+"\nclient "+vw+"x"+vh+"\nscreen "+screen.width+"x"+screen.height+"\ndpr "+devicePixelRatio+"\nscale "+s.toFixed(3);
+  }
+  addEventListener("resize",fit);
+  addEventListener("load",fit);
+  fit();
+  setInterval(fit,1000); // プレーヤーが後から枠サイズを変える場合に追従
 
   /* --- 定数 --- */
   var WEEK_EN=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
