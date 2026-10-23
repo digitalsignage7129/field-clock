@@ -6,17 +6,18 @@
 <title>Elegant Clock 310x904</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Shippori+Mincho:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* ===== 時間帯で自動切替するカラーテーマ ===== */
+  /* ===== 時間帯で自動切替するカラーテーマ（LED視認性重視でコントラスト強め） ===== */
   :root{
-    --bg1:#fbf8f2; --bg2:#eee5d4; --ink:#2b2a28; --sub:#7a746a;
-    --gold:#a8834a; --line:rgba(168,131,74,.55); --accent:#b0413e; --sat:#3d5a80;
+    --jp:"Shippori Mincho","Noto Serif CJK JP","Hiragino Mincho ProN","Yu Mincho",serif;
+    --bg1:#fbf8f2; --bg2:#efe6d5; --ink:#1c1b19; --sub:#3f3a33;
+    --gold:#8a6830; --deco:#b08a4c; --line:rgba(160,122,62,.9); --accent:#a8302c; --sat:#24497a;
   }
-  .t-morning{ --bg1:#f8f6f0; --bg2:#e6ebe8; --ink:#24304a; --sub:#6c7486; --gold:#a8834a; --line:rgba(168,131,74,.5); --accent:#b0413e; --sat:#3d5a80;}
-  .t-day    { --bg1:#fbf8f2; --bg2:#eee5d4; --ink:#2b2a28; --sub:#7a746a; --gold:#a8834a; --line:rgba(168,131,74,.55); --accent:#b0413e; --sat:#3d5a80;}
-  .t-evening{ --bg1:#3b2630; --bg2:#1f1720; --ink:#f3e7da; --sub:#c7b2a4; --gold:#d6b27a; --line:rgba(214,178,122,.5); --accent:#e3876f; --sat:#9fb6d6;}
-  .t-night  { --bg1:#17223a; --bg2:#0b111e; --ink:#eef0f4; --sub:#9aa3b5; --gold:#cfae72; --line:rgba(207,174,114,.45); --accent:#e08a80; --sat:#8fb0e0;}
+  .t-morning{ --bg1:#f8f6f0; --bg2:#e4eae6; --ink:#16213a; --sub:#34405a; --gold:#8a6830; --deco:#b08a4c; --line:rgba(160,122,62,.9); --accent:#a8302c; --sat:#24497a;}
+  .t-day    { --bg1:#fbf8f2; --bg2:#efe6d5; --ink:#1c1b19; --sub:#3f3a33; --gold:#8a6830; --deco:#b08a4c; --line:rgba(160,122,62,.9); --accent:#a8302c; --sat:#24497a;}
+  .t-evening{ --bg1:#3b2630; --bg2:#1f1720; --ink:#fff6ec; --sub:#ecdccf; --gold:#f0cc8e; --deco:#e0bb7c; --line:rgba(224,187,124,.9); --accent:#ff9a80; --sat:#b5ccef;}
+  .t-night  { --bg1:#17223a; --bg2:#0b111e; --ink:#ffffff; --sub:#dde2ec; --gold:#ecc985; --deco:#d9b676; --line:rgba(217,182,118,.85); --accent:#ff9c90; --sat:#a9c6f2;}
 
   html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%}
   #stage{
@@ -25,56 +26,57 @@
     background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 100%);
     color:var(--ink);
     font-family:"Cormorant Garamond","Times New Roman",serif;
-    -webkit-font-smoothing:antialiased;
+    font-weight:600;
   }
-  .frame{position:absolute;inset:14px;border:1px solid var(--line);pointer-events:none;z-index:5}
-  .frame::before{content:"";position:absolute;inset:5px;border:1px solid var(--line);opacity:.45}
-  .corner{position:absolute;width:10px;height:10px;background:var(--gold);transform:rotate(45deg);z-index:6}
-  .c-t{top:9px;left:150px}.c-b{bottom:9px;left:150px}
+  .frame{position:absolute;inset:12px;border:3px solid var(--line);pointer-events:none;z-index:5}
+  .frame::before{content:"";position:absolute;inset:5px;border:2px solid var(--line);opacity:.6}
+  .corner{position:absolute;width:14px;height:14px;background:var(--deco);transform:rotate(45deg);z-index:6}
+  .c-t{top:6px;left:148px}.c-b{bottom:6px;left:148px}
 
   .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
          opacity:0;transition:opacity 1.6s ease;}
   .scene.on{opacity:1}
 
-  .greet{font-size:15px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:500}
-  .greet-jp{font-family:"Shippori Mincho",serif;font-size:13px;letter-spacing:.3em;color:var(--sub);margin-top:6px}
+  .greet{font-size:20px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .greet-jp{font-family:var(--jp);font-size:22px;letter-spacing:.12em;color:var(--sub);margin-top:6px;font-weight:700}
   .num{font-variant-numeric:lining-nums tabular-nums}
 
   /* --- Scene 1 : Digital --- */
-  .d-hh,.d-mm{font-size:176px;line-height:.86;font-weight:300;letter-spacing:-.02em}
-  .d-rule{width:190px;height:1px;background:var(--line);margin:26px 0 30px;position:relative}
-  .d-sec{position:absolute;left:0;top:-1px;height:3px;background:var(--gold);width:0}
-  .d-rule::before,.d-rule::after{content:"";position:absolute;top:-3px;width:7px;height:7px;background:var(--gold);transform:rotate(45deg)}
-  .d-rule::before{left:-12px}.d-rule::after{right:-12px}
-  .d-week{margin-top:54px;font-size:20px;letter-spacing:.42em;padding-left:.42em;font-weight:500}
-  .d-date{font-size:30px;font-style:italic;margin-top:4px}
-  .d-jp{font-family:"Shippori Mincho",serif;font-size:14px;color:var(--sub);letter-spacing:.12em;margin-top:10px}
+  .d-hh,.d-mm{font-size:180px;line-height:.86;font-weight:700;letter-spacing:-.02em}
+  .d-rule{width:200px;height:3px;background:var(--line);margin:24px 0 28px;position:relative}
+  .d-sec{position:absolute;left:0;top:-3px;height:9px;background:var(--gold);width:0}
+  .d-rule::before,.d-rule::after{content:"";position:absolute;top:-5px;width:12px;height:12px;background:var(--deco);transform:rotate(45deg)}
+  .d-rule::before{left:-20px}.d-rule::after{right:-20px}
+  .d-week{margin-top:40px;font-size:32px;letter-spacing:.14em;padding-left:.14em;font-weight:700}
+  .d-date{font-size:40px;font-style:italic;margin-top:0;font-weight:700}
+  .d-jp{font-family:var(--jp);font-size:24px;color:var(--sub);letter-spacing:.04em;margin-top:6px;font-weight:700}
 
   /* --- Scene 2 : Analog --- */
-  .a-svg{width:270px;height:270px;margin:40px 0 44px}
-  .a-digi{font-size:44px;font-weight:400;letter-spacing:.06em}
-  .a-date{font-size:18px;letter-spacing:.34em;padding-left:.34em;color:var(--sub);margin-top:6px}
+  .a-svg{width:276px;height:276px;margin:34px 0 34px}
+  .a-digi{font-size:72px;font-weight:700;letter-spacing:.02em;line-height:1}
+  .a-date{font-size:30px;letter-spacing:.1em;padding-left:.1em;color:var(--sub);margin-top:10px;font-weight:700}
 
   /* --- Scene 3 : 縦書き --- */
-  .v-wrap{display:flex;flex-direction:row-reverse;align-items:flex-start;gap:26px;font-family:"Shippori Mincho",serif}
+  .v-wrap{display:flex;flex-direction:row-reverse;align-items:flex-start;gap:14px;font-family:var(--jp)}
+  .v-wrap>*{flex-shrink:0}
   .v-col{writing-mode:vertical-rl;text-orientation:upright;white-space:nowrap}
-  .v-small{font-size:17px;letter-spacing:.32em;color:var(--sub)}
-  .v-big{font-size:58px;letter-spacing:.12em;font-weight:600;line-height:1}
-  .v-mid{padding-top:120px}
-  .seal{width:46px;height:46px;border:2px solid var(--accent);color:var(--accent);border-radius:4px;
-        display:flex;align-items:center;justify-content:center;font-family:"Shippori Mincho",serif;font-size:24px;font-weight:600;margin-top:46px}
+  .v-small{font-size:23px;letter-spacing:.12em;color:var(--sub);font-weight:700}
+  .v-big{font-size:60px;letter-spacing:.06em;font-weight:800;line-height:1}
+  .v-mid{padding-top:90px}
+  .seal{width:50px;height:50px;border:4px solid var(--accent);color:var(--accent);border-radius:5px;
+        display:flex;align-items:center;justify-content:center;font-family:var(--jp);font-size:28px;font-weight:800;margin-top:30px}
 
   /* --- Scene 4 : Calendar --- */
-  .c-month{font-size:150px;line-height:.85;font-weight:300}
-  .c-month-en{font-size:20px;letter-spacing:.4em;padding-left:.4em;text-transform:uppercase;margin-top:12px;font-weight:500}
-  .c-era{font-family:"Shippori Mincho",serif;font-size:13px;color:var(--sub);letter-spacing:.2em;margin-top:6px}
-  .c-grid{display:grid;grid-template-columns:repeat(7,36px);gap:2px;margin:36px 0 34px}
-  .c-grid div{height:34px;display:flex;align-items:center;justify-content:center;font-size:19px}
-  .c-grid .h{font-size:13px;letter-spacing:.08em;color:var(--sub);font-weight:500;height:26px}
+  .c-month{font-size:150px;line-height:.85;font-weight:700}
+  .c-month-en{font-size:28px;letter-spacing:.1em;padding-left:.1em;text-transform:uppercase;margin-top:10px;font-weight:700}
+  .c-era{font-family:var(--jp);font-size:22px;color:var(--sub);letter-spacing:.1em;margin-top:4px;font-weight:700}
+  .c-grid{display:grid;grid-template-columns:repeat(7,37px);gap:0;margin:24px 0 22px}
+  .c-grid div{height:38px;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:700}
+  .c-grid .h{font-size:14px;letter-spacing:0;color:var(--sub);height:30px}
   .c-grid .sun{color:var(--accent)} .c-grid .sat{color:var(--sat)}
-  .c-grid .today{background:var(--gold);color:var(--bg1);border-radius:50%;font-weight:500}
-  .c-time{font-size:58px;font-weight:300;letter-spacing:.04em}
-  .c-week{font-size:15px;letter-spacing:.36em;padding-left:.36em;color:var(--gold);font-weight:500}
+  .c-grid .today{background:var(--gold);color:var(--bg1);border-radius:50%;width:36px;height:36px;margin:1px auto}
+  .c-time{font-size:72px;font-weight:700;letter-spacing:.02em;line-height:1}
+  .c-week{font-size:26px;letter-spacing:.12em;padding-left:.12em;color:var(--gold);font-weight:700;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -99,14 +101,14 @@
     <div class="greet js-greet">Good Afternoon</div>
     <div class="greet-jp js-greet-jp">こんにちは</div>
     <svg class="a-svg" viewBox="0 0 260 260" aria-hidden="true">
-      <circle cx="130" cy="130" r="126" fill="none" stroke="var(--line)" stroke-width="1"/>
-      <circle cx="130" cy="130" r="118" fill="none" stroke="var(--line)" stroke-width="1" opacity=".5"/>
+      <circle cx="130" cy="130" r="126" fill="none" stroke="var(--line)" stroke-width="3"/>
+      <circle cx="130" cy="130" r="119" fill="none" stroke="var(--line)" stroke-width="1.5" opacity=".6"/>
       <g id="a-ticks"></g>
-      <line id="a-h" x1="130" y1="142" x2="130" y2="72" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
-      <line id="a-m" x1="130" y1="146" x2="130" y2="40" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-      <line id="a-s" x1="130" y1="152" x2="130" y2="30" stroke="var(--gold)" stroke-width="1.4" stroke-linecap="round"/>
-      <circle cx="130" cy="130" r="5" fill="var(--gold)"/>
-      <circle cx="130" cy="130" r="2" fill="var(--bg1)"/>
+      <line id="a-h" x1="130" y1="142" x2="130" y2="72" stroke="var(--ink)" stroke-width="9" stroke-linecap="round"/>
+      <line id="a-m" x1="130" y1="146" x2="130" y2="40" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/>
+      <line id="a-s" x1="130" y1="152" x2="130" y2="30" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="130" cy="130" r="9" fill="var(--accent)"/>
+      <circle cx="130" cy="130" r="3" fill="var(--bg1)"/>
     </svg>
     <div class="a-digi num" id="a-digi">00:00</div>
     <div class="a-date num" id="a-date">10.23 FRI</div>
@@ -204,12 +206,12 @@
     var g=$("a-ticks"),ns="http://www.w3.org/2000/svg";
     for(var i=0;i<60;i++){
       var major=i%5===0, a=i*6*Math.PI/180;
-      var r1=major?104:110, r2=114;
+      var r1=i%15===0?92:(major?100:108), r2=114;
       var l=document.createElementNS(ns,"line");
       l.setAttribute("x1",130+r1*Math.sin(a)); l.setAttribute("y1",130-r1*Math.cos(a));
       l.setAttribute("x2",130+r2*Math.sin(a)); l.setAttribute("y2",130-r2*Math.cos(a));
-      l.setAttribute("stroke",major?"var(--gold)":"var(--line)");
-      l.setAttribute("stroke-width",i%15===0?3:(major?1.6:1));
+      l.setAttribute("stroke",major?"var(--ink)":"var(--line)");
+      l.setAttribute("stroke-width",i%15===0?7:(major?4:2));
       g.appendChild(l);
     }
   })();
