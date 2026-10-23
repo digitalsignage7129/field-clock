@@ -57,11 +57,11 @@
   .a-date{font-size:30px;letter-spacing:.1em;padding-left:.1em;color:var(--sub);margin-top:10px;font-weight:700}
 
   /* --- Scene 3 : 縦書き --- */
-  .v-wrap{display:flex;flex-direction:row-reverse;align-items:flex-start;gap:14px;font-family:var(--jp)}
+  .v-wrap{display:flex;flex-direction:row-reverse;align-items:stretch;gap:14px;font-family:var(--jp)}
   .v-wrap>*{flex-shrink:0}
   .v-col{writing-mode:vertical-rl;text-orientation:upright;white-space:nowrap}
   .v-small{font-size:23px;letter-spacing:.12em;color:var(--sub);font-weight:700}
-  .v-big{font-size:60px;letter-spacing:.06em;font-weight:800;line-height:1}
+  .v-big{font-size:96px;letter-spacing:.04em;font-weight:800;line-height:1}
   .v-mid{padding-top:90px}
   .seal{width:50px;height:50px;border:4px solid var(--accent);color:var(--accent);border-radius:5px;
         display:flex;align-items:center;justify-content:center;font-family:var(--jp);font-size:28px;font-weight:800;margin-top:30px}
@@ -117,11 +117,9 @@
   <!-- Scene 3 : 縦書き -->
   <section class="scene" id="s-vertical">
     <div class="v-wrap">
-      <div class="v-col v-small" id="v-date">令和八年　十月二十三日</div>
-      <div class="v-col v-big v-mid" id="v-hh">十五時</div>
-      <div class="v-col v-big v-mid" id="v-mm">二十一分</div>
-      <div style="display:flex;flex-direction:column;align-items:center">
-        <div class="v-col v-small" id="v-week">金曜日</div>
+      <div class="v-col v-small" id="v-date">令和八年　十月二十三日　金曜日</div>
+      <div class="v-col v-big" id="v-time">十五時二十一分</div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
         <div class="seal">時</div>
       </div>
     </div>
@@ -269,10 +267,14 @@
     set($("a-date"),pad(mo+1)+"."+pad(da)+" "+WEEK_SH[w]);
 
     // 縦書き
-    set($("v-date"),"令和"+reiwa(y)+"年　"+kan(mo+1)+"月"+kan(da)+"日");
-    set($("v-hh"),kan(h)+"時");
-    set($("v-mm"),mi===0?"丁度":kan(mi)+"分");
-    set($("v-week"),WEEK_JP[w]+"曜日");
+    set($("v-date"),"令和"+reiwa(y)+"年　"+kan(mo+1)+"月"+kan(da)+"日　"+WEEK_JP[w]+"曜日");
+    var vt=kan(h)+"時"+(mi===0?"丁度":kan(mi)+"分");
+    var vEl=$("v-time");
+    if(vEl.textContent!==vt){
+      vEl.textContent=vt;
+      // 文字数に合わせて枠いっぱいの大きさに（最大116px）
+      vEl.style.fontSize=Math.min(116,Math.floor(780/(vt.length*1.04)))+"px";
+    }
 
     // Calendar
     set($("c-month"),String(mo+1)); set($("c-month-en"),MON_EN[mo]+" "+y);
