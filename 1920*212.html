@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>時計サイネージ（1920*212）</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #111111;
+            font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Noto Sans CJK JP", Meiryo, "Helvetica Neue", Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* 表示エリア（1920*212 固定） */
+        .signage-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1920px;
+            height: 212px;
+            margin-top: -106px;
+            margin-left: -960px;
+            background-color: #0b1d3a;
+            background: linear-gradient(90deg, #0b1d3a 0%, #173a6b 100%);
+            overflow: hidden;
+        }
+
+        /* 上下の細いアクセントライン */
+        .line-top, .line-bottom {
+            position: absolute;
+            left: 0;
+            width: 1920px;
+            height: 4px;
+            background: #f2c14e;
+            z-index: 5;
+        }
+        .line-top { top: 0; }
+        .line-bottom { bottom: 0; }
+
+        /* 秒の進行バー（下のラインの上を1分で1周） */
+        .progress {
+            position: absolute;
+            left: 556px;
+            bottom: 0;
+            width: 0;
+            height: 4px;
+            background: #ffffff;
+            opacity: 0.9;
+            z-index: 6;
+        }
+
+        /* 左の日付ラベル（矢印型） */
+        .badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 520px;
+            height: 212px;
+            z-index: 4;
+            text-align: center;
+            color: #0b1d3a;
+        }
+        .badge-shape {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 556px;
+            height: 212px;
+        }
+        .badge-year, .badge-day, .badge-week {
+            position: relative;
+            z-index: 1;
+            display: block;
+        }
+        .badge-year {
+            padding-top: 30px;
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 32px;
+            letter-spacing: 0.3em;
+            text-indent: 0.3em;
+            opacity: 0.8;
+        }
+        .badge-day {
+            margin-top: 2px;
+            font-size: 86px;
+            font-weight: 800;
+            line-height: 96px;
+            letter-spacing: 0.04em;
+        }
+        .badge-week {
+            margin-top: 2px;
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 36px;
+            letter-spacing: 0.22em;
+            text-indent: 0.22em;
+        }
+
+        /* 時刻 */
+        .clock {
+            position: absolute;
+            top: 0;
+            left: 660px;
+            height: 212px;
+            line-height: 212px;
+            white-space: nowrap;
+            color: #ffffff;
+            z-index: 2;
+        }
+        .clock .d {
+            display: inline-block;
+            width: 0.64em;
+            text-align: center;
+        }
+        .clock .big {
+            font-size: 156px;
+            font-weight: 700;
+        }
+        .clock .colon {
+            display: inline-block;
+            width: 0.3em;
+            text-align: center;
+            position: relative;
+            top: -0.07em;
+            color: #f2c14e;
+            -webkit-animation: blink 1s step-end infinite;
+            animation: blink 1s step-end infinite;
+        }
+        .clock .sec {
+            font-size: 58px;
+            font-weight: 700;
+            margin-left: 18px;
+            color: #f2c14e;
+        }
+        @-webkit-keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.25; } 100% { opacity: 1; } }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.25; } 100% { opacity: 1; } }
+
+        /* あいさつ */
+        .sep {
+            position: absolute;
+            left: 1296px;
+            top: 58px;
+            width: 2px;
+            height: 96px;
+            background: #f2c14e;
+            opacity: 0.5;
+            z-index: 2;
+        }
+        .greet {
+            position: absolute;
+            left: 1336px;
+            top: 0;
+            width: 540px;
+            height: 212px;
+            text-align: center;
+            color: #ffffff;
+            z-index: 2;
+        }
+        .greet-main {
+            padding-top: 64px;
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 66px;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+        .greet-sub {
+            margin-top: 8px;
+            font-size: 26px;
+            font-weight: 600;
+            line-height: 30px;
+            letter-spacing: 0.28em;
+            text-indent: 0.28em;
+            color: #f2c14e;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="signage-wrapper">
+        <div class="line-top"></div>
+        <div class="line-bottom"></div>
+        <div class="progress" id="progress"></div>
+
+        <div class="badge">
+            <span class="badge-year" id="dYear"></span>
+            <span class="badge-day" id="dDay"></span>
+            <span class="badge-week" id="dWeek"></span>
+            <svg class="badge-shape" width="556" height="212" viewBox="0 0 556 212" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="0,0 520,0 556,106 520,212 0,212" fill="#f2c14e" shape-rendering="geometricPrecision"></polygon>
+            </svg>
+        </div>
+
+        <div class="clock">
+            <span class="big"><span class="d" id="h1">0</span><span class="d" id="h2">0</span><span class="colon">:</span><span class="d" id="m1">0</span><span class="d" id="m2">0</span></span><span class="sec"><span class="d" id="s1">0</span><span class="d" id="s2">0</span></span>
+        </div>
+
+        <div class="sep"></div>
+        <div class="greet">
+            <div class="greet-main" id="greetMain"></div>
+            <div class="greet-sub" id="greetSub"></div>
+        </div>
+    </div>
+
+    <script>
+        var TZ_OFFSET = 9;            // 日本時間（端末のタイムゾーン設定に左右されない）
+        var PROGRESS_WIDTH = 1364;    // 進行バーの全幅（1920 - 556）
+        var WEEK_JA = ['日', '月', '火', '水', '木', '金', '土'];
+        var WEEK_EN = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
+        var last = { sec: -1, min: -1, day: -1 };
+
+        function setDigits(prefix, value) {
+            var t = value < 10 ? '0' + value : '' + value;
+            document.getElementById(prefix + '1').textContent = t.charAt(0);
+            document.getElementById(prefix + '2').textContent = t.charAt(1);
+        }
+
+        function setGreeting(h) {
+            var ja, en;
+            if (h >= 5 && h < 10)       { ja = 'おはようございます'; en = 'GOOD MORNING'; }
+            else if (h >= 10 && h < 17) { ja = 'こんにちは';         en = 'GOOD AFTERNOON'; }
+            else                        { ja = 'こんばんは';         en = 'GOOD EVENING'; }
+            document.getElementById('greetMain').textContent = ja;
+            document.getElementById('greetSub').textContent = en;
+        }
+
+        function tick() {
+            var d = new Date(Date.now() + TZ_OFFSET * 3600000);
+            var h = d.getUTCHours(), m = d.getUTCMinutes(), s = d.getUTCSeconds();
+
+            if (s !== last.sec) {
+                last.sec = s;
+                setDigits('s', s);
+            }
+            if (m !== last.min) {
+                last.min = m;
+                setDigits('h', h);
+                setDigits('m', m);
+                setGreeting(h);
+            }
+            var dayKey = d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+            if (dayKey !== last.day) {
+                last.day = dayKey;
+                var w = d.getUTCDay();
+                document.getElementById('dYear').textContent = d.getUTCFullYear() + '年';
+                document.getElementById('dDay').textContent = (d.getUTCMonth() + 1) + '月' + d.getUTCDate() + '日';
+                document.getElementById('dWeek').textContent = WEEK_JA[w] + '曜日　' + WEEK_EN[w];
+            }
+            var pct = (s * 1000 + d.getUTCMilliseconds()) / 60000;
+            document.getElementById('progress').style.width = Math.round(pct * PROGRESS_WIDTH) + 'px';
+        }
+
+        tick();
+        setInterval(tick, 200);
+    </script>
+</body>
+</html>
