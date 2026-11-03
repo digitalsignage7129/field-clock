@@ -222,12 +222,12 @@
         function fitToScreen() {
             var w = window.innerWidth || document.documentElement.clientWidth;
             var h = window.innerHeight || document.documentElement.clientHeight;
-            // 既定は 1390x151 に合わせる。&fit=横x縦 で別サイズ、&fit=off で実際の領域サイズに合わせる
+            // 既定は 1387x150 に合わせる。&fit=横x縦 で別サイズ、&fit=off で実際の領域サイズに合わせる
             var f = /[?&]fit=(\d+)x(\d+)/.exec(window.location.search);
             if (f) {
                 w = parseInt(f[1], 10); h = parseInt(f[2], 10);
             } else if (!/[?&]fit=off/.test(window.location.search)) {
-                w = 1390; h = 151;   // この表示領域の実測サイズ（指定がなければこの大きさに合わせる）
+                w = 1387; h = 150;   // この表示領域の実測サイズ（指定がなければこの大きさに合わせる）
             }
             if (!w || !h) return;
             var sx = w / 1920, sy = h / 212;
