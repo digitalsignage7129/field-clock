@@ -222,6 +222,9 @@
         function fitToScreen() {
             var w = window.innerWidth || document.documentElement.clientWidth;
             var h = window.innerHeight || document.documentElement.clientHeight;
+            // URLに &fit=横x縦（例: &fit=1390x151）を付けると、その大きさに合わせて表示する
+            var f = /[?&]fit=(\d+)x(\d+)/.exec(window.location.search);
+            if (f) { w = parseInt(f[1], 10); h = parseInt(f[2], 10); }
             if (!w || !h) return;
             var s = Math.min(w / 1920, h / 212);
             var x = (w - 1920 * s) / 2;
