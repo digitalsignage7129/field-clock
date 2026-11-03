@@ -230,10 +230,16 @@
                 w = 1390; h = 151;   // この表示領域の実測サイズ（指定がなければこの大きさに合わせる）
             }
             if (!w || !h) return;
-            var s = Math.min(w / 1920, h / 212);
-            var x = (w - 1920 * s) / 2;
-            var y = (h - 212 * s) / 2;
-            var t = 'translate(' + x + 'px,' + y + 'px) scale(' + s + ')';
+            var sx = w / 1920, sy = h / 212;
+            var t;
+            if (Math.abs(sx / sy - 1) < 0.05) {
+                // 縦横比がほぼ同じなら、わずかに引き伸ばして領域をぴったり埋める（隙間を出さない）
+                t = 'scale(' + sx + ',' + sy + ')';
+            } else {
+                // 比率が大きく違うときは、歪ませずに全体が収まるよう縮小して中央に置く
+                var s = Math.min(sx, sy);
+                t = 'translate(' + ((w - 1920 * s) / 2) + 'px,' + ((h - 212 * s) / 2) + 'px) scale(' + s + ')';
+            }
             wrap.style.webkitTransform = t;
             wrap.style.transform = t;
         }
